@@ -2,6 +2,7 @@ package pig_bot
 
 import (
 	"database/sql"
+	"gopkg.in/telebot.v3"
 	"gorm.io/gorm"
 )
 
@@ -59,5 +60,14 @@ func RegisterUser(tgID int64, tgName string, pigName string, db *gorm.DB) *User 
 		},
 	}
 	db.Create(user)
+	return user
+}
+
+func GetOrRegisterUser(c telebot.Context, db *gorm.DB) *User {
+	tgID := c.Sender().ID
+	user, inserted := GetUser(tgID, db)
+	if !inserted {
+		user = RegisterUser(tgID, c.Sender().Username, c.Sender().Username, db)
+	}
 	return user
 }

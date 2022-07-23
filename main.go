@@ -8,7 +8,10 @@ import (
 	"os"
 	pig_bot "pig-bot/pigs"
 	"time"
+	"fmt"
 )
+
+const BotEnvVarName = "BOT_TOKEN"
 
 func main() {
 	newLogger := logger.New(
@@ -20,7 +23,7 @@ func main() {
 			Colorful:                  true,        // Disable color
 		},
 	)
-	dsn := "host=localhost user=skazzi dbname=postgres port=5432 sslmode=disable TimeZone=Europe/Moscow"
+	dsn := "host=localhost user=postgres password=postgres dbname=tst port=5432 sslmode=disable TimeZone=Europe/Moscow"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
 	})
@@ -28,6 +31,12 @@ func main() {
 		panic(err)
 	}
 	pig_bot.AutoMigrate(db)
-	bot, err := pig_bot.NewBot(&pig_bot.Params{Token: "5570481617:AAHi7W1XaFvwJSSGN_FnE8XJGk5QPv0NFkY", DB: db})
+	bot_token, ok := os.LookupEnv(BotEnvVarName)
+	if !ok {
+            panic(fmt.Sprintf("%s env variable must be set", BotEnvVarName))
+	}
+
+
+	bot, err := pig_bot.NewBot(&pig_bot.Params{Token: bot_token, DB: db})
 	bot.Start()
 }

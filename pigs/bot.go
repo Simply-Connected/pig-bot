@@ -45,7 +45,7 @@ func NewBot(params *Params) (*tele.Bot, error) {
 			return err
 		}
 		curTime := time.Now().In(loc)
-		fmt.Printf("DEBUG:%s", curTime.UTC().String())
+		fmt.Printf("DEBUG:%s", curTime.String())
 		if user.Pig.LastGrow.Valid &&
 			curTime.Day() == user.Pig.LastGrow.Time.Day() &&
 			curTime.Sub(user.Pig.LastGrow.Time).Hours() < 24 {

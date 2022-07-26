@@ -40,7 +40,11 @@ func NewBot(params *Params) (*tele.Bot, error) {
 	b.Handle("/grow", func(c tele.Context) error {
 		user := GetOrRegisterUser(c, db)
 
-		curTime := time.Now()
+		loc, err := time.LoadLocation("Europe/Moscow")
+		if err != nil {
+			return err
+		}
+		curTime := time.Now().In(loc)
 		fmt.Printf("DEBUG:%s", curTime.UTC().String())
 		if user.Pig.LastGrow.Valid &&
 			curTime.Day() == user.Pig.LastGrow.Time.Day() &&

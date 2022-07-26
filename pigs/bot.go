@@ -47,8 +47,8 @@ func NewBot(params *Params) (*tele.Bot, error) {
 		curTime := time.Now().In(loc)
 		fmt.Printf("DEBUG:%s", curTime.String())
 		if user.Pig.LastGrow.Valid &&
-			curTime.Day() == user.Pig.LastGrow.Time.Day() &&
-			curTime.Sub(user.Pig.LastGrow.Time).Hours() < 24 {
+			curTime.Day() == user.Pig.LastGrow.Time.In(loc).Day() &&
+			curTime.Sub(user.Pig.LastGrow.Time.In(loc)).Hours() < 24 {
 			return c.Send(fmt.Sprintf("Вы уже кормили свою свинью сегодня.\n\nВес вашего свина: *%d*", user.Pig.Weight), tele.ModeMarkdown)
 		}
 

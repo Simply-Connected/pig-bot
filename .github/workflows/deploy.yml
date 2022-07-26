@@ -14,13 +14,13 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Make envfile
-      uses: SpicyPizza/create-envfile@v1
-      with:
-        envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        envkey_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        envkey_BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        file_name: .env.production
+      run: |
+        touch .env.production
+        echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env.production
+        echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env.production
+        echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env.production
+        echo BOT_TOKEN=${{ secrets.BOT_TOKEN }} >> .env.production
+        cat .env.production
         
     - name: Build Docker Images
       run: docker-compose build  --no-cache

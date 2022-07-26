@@ -40,10 +40,15 @@ func NewBot(params *Params) (*tele.Bot, error) {
 	b.Handle("/grow", func(c tele.Context) error {
 		user := GetOrRegisterUser(c, db)
 
-		curTime := time.Now()
+		loc, err := time.LoadLocation("Europe/Moscow")
+		if err != nil {
+			return err
+		}
+		curTime := time.Now().In(loc)
+		fmt.Printf("DEBUG:%s", curTime.String())
 		if user.Pig.LastGrow.Valid &&
-			curTime.Day() == user.Pig.LastGrow.Time.Day() &&
-			curTime.Sub(user.Pig.LastGrow.Time).Hours() < 24 {
+			curTime.Day() == user.Pig.LastGrow.Time.In(loc).Day() &&
+			curTime.Sub(user.Pig.LastGrow.Time.In(loc)).Hours() < 24 {
 			return c.Send(fmt.Sprintf("Вы уже кормили свою свинью сегодня.\n\nВес вашего свина: *%d*", user.Pig.Weight), tele.ModeMarkdown)
 		}
 
@@ -58,7 +63,7 @@ func NewBot(params *Params) (*tele.Bot, error) {
 				user.Pig.Name, user.Pig.Weight), tele.ModeMarkdown)
 		}
 		user.Pig.Weight = uint32(int32(user.Pig.Weight) + diff)
-		user.Pig.LastGrow = sql.NullTime{Time: time.Now(), Valid: true}
+		user.Pig.LastGrow = sql.NullTime{Time: curTime, Valid: true}
 		db.Save(&user.Pig)
 		return c.Send(getGrowPhrase(&user.Pig, diff), tele.ModeMarkdown)
 	})
